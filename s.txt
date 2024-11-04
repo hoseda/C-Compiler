@@ -1,0 +1,11 @@
+int main ()
+{
+    int a = 10;
+    float = 22.23;
+    /* there is comment. 
+ 	* line 1
+	* line 2
+	* line 3
+    */
+    return 0;
+}

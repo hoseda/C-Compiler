@@ -1,8 +1,6 @@
 %{
-#include <stdio.h>
-void count();
-void stat();
-int token_number = 0;
+#include "y.tab.h"
+
 enum Tokens {
     INT = 0,
     CHAR,
@@ -21,56 +19,42 @@ enum Tokens {
     RETURN,
 };
 
+const char* keywordsName[] = {"INT" , "CHAR" , "FLOAT" , "IF" , "ELSE" , "ELSEIF" , "SWITCH" , "CASE" , "BREAK" , "CONTINUE" , "DO" , "FOR" , "WHILE" , "VOID" , "RETURN"};
 enum Tokens func(enum Tokens tk){
-    printf("%d\n" , tk);
+    printf("%s\n" , keywordsName[tk]);
 }
 
 %}
 
 DIGIT    [0-9]
-ID       [a-zA-z][a-zA-z0-9]*
+ID       [a-zA-Z_][a-zA-Z0-9_]*
 INT      {DIGIT}+
-REAL     {DIGIT}*"."{DIGIT}+
+REAL     {DIGIT}+"."{DIGIT}+
 
 
 %%
-if                                  { count(); func(IF); }
-else                                { count(); func(ELSE); }
-"else if"                           { count(); func(ELSEIF); }
-int                                 { count(); func(INT); }
-char                                { count(); func(CHAR); }
-float                               { count(); func(FLOAT); }
-switch                              { count(); func(SWITCH); }
-case                                { count(); func(CASE); }
-break                               { count(); func(BREAK); }
-continue                            { count(); func(CONTINUE); }
-do                                  { count(); func(DO); }
-for                                 { count(); func(FOR); }
-while                               { count(); func(WHILE); }
-void                                { count(); func(VOID); }
-return                              { count(); func(RETURN); }
-"stat"                              { stat(); }
-"exit"                              { stat(); return 0; }
-{INT}                               { printf("%s is DIGIT\n",yytext); }
-{ID}                                { printf("%s is IDENTIFIER\n" , yytext); }
 
-[ \t\n]+                            {}
-\/\/.*                              {}
-\/\*.*\*\/                          {}
+{INT}                   { yylval.val = atot(yytext); return(NUMBER) ; }
+{REAL}                  { sscanf(yytext , "%f" , &yylval.val); return(NUMBER) ; }
 
-.                                   { printf("%s is ERROR\n" , yytext); }
+"+"                     return(PLUS);
+"-"                     return(MINUS);
+"*"                     return(MULT);
+"/"                     return(DIV);
+"^"                     return(EXPON);
+"("                     return(LB);
+")"                     return(RB);
+\n                      return(EOL);
+[\t ]*
+.                       {yyerror("invalid character.") ; return(EOL); }
+
 %%
 
-void count(){
-    token_number++;
-}
-
-void stat(){
-    printf("\n token number : %d\n" , token_number);
-}
 
 int yywrap(){}
-int main(){
+int main(int argc , char *argv[]){
+    yyin = fopen(argv[1] , "r");
     yylex();
+    fclose(yyin);
     return 0;
 }
