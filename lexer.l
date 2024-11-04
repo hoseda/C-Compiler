@@ -1,5 +1,5 @@
 %{
-#include "y.tab.h"
+#include "parser.tab.h"
 
 enum Tokens {
     INT = 0,
@@ -34,7 +34,7 @@ REAL     {DIGIT}+"."{DIGIT}+
 
 %%
 
-{INT}                   { yylval.val = atot(yytext); return(NUMBER) ; }
+{INT}                   { yylval.val = atol(yytext); return(NUMBER) ; }
 {REAL}                  { sscanf(yytext , "%f" , &yylval.val); return(NUMBER) ; }
 
 "+"                     return(PLUS);
@@ -46,15 +46,16 @@ REAL     {DIGIT}+"."{DIGIT}+
 ")"                     return(RB);
 \n                      return(EOL);
 [\t ]*
-.                       {yyerror("invalid character.") ; return(EOL); }
+.                       { printf("invalid character.\n") ; return(EOL); }
 
 %%
 
+int yywrap(){
+    return 1;
+}
 
-int yywrap(){}
-int main(int argc , char *argv[]){
-    yyin = fopen(argv[1] , "r");
+int main()
+{
     yylex();
-    fclose(yyin);
     return 0;
 }

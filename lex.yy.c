@@ -370,7 +370,7 @@ char *yytext;
 #line 1 "lexer.l"
 #define INITIAL 0
 #line 2 "lexer.l"
-#include "y.tab.h"
+#include "parser.tab.h"
 
 enum Tokens {
     INT = 0,
@@ -635,7 +635,7 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 YY_RULE_SETUP
 #line 37 "lexer.l"
-{ yylval.val = atot(yytext); return(NUMBER) ; }
+{ yylval.val = atol(yytext); return(NUMBER) ; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
@@ -690,7 +690,7 @@ YY_RULE_SETUP
 case 12:
 YY_RULE_SETUP
 #line 49 "lexer.l"
-{yyerror("invalid character.") ; return(EOL); }
+{ printf("invalid character.\n") ; return(EOL); }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
@@ -1586,11 +1586,12 @@ int main()
 #line 51 "lexer.l"
 
 
+int yywrap(){
+    return 1;
+}
 
-int yywrap(){}
-int main(int argc , char *argv[]){
-    yyin = fopen(argv[1] , "r");
+int main()
+{
     yylex();
-    fclose(yyin);
     return 0;
 }
